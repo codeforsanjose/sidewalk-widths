@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Sidewalk Widths San José</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+</style>
+</head>
+<body>
+<style>
+    .mapboxgl-popup {
+        max-width: 400px;
+        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    }
+</style>
+<div id="map"></div>
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoiaW1waWFhYSIsImEiOiJjazlrZ2NtNGYwZDJhM2VtaTZ5b2traDN0In0.V0La6EYFikK9MqKivUaD7w';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/impiaaa/ck9kra1tk0yc81inuzdzmnw4z',
+        center: [-121.88617731105547648, 37.33797754718690953],
+        zoom: 16
+    });
+    
+    var fmt = new Intl.NumberFormat('en-US', {
+        maximumSignificantDigits: 3
+    });
+
+    map.on('load', function() {
+        // Create a popup, but don't add it to the map yet.
+        var popup = new mapboxgl.Popup({
+            closeButton: false,
+            closeOnClick: false
+        });
+
+        function enter(e) {
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+
+            //var coordinates = e.features[0].geometry.coordinates.slice();
+            var width = e.features[0].properties.WIDTH;
+            var description = '<h3>'+fmt.format(width)+' ft</h3>';
+            description += '<p>The CDC recommends staying at least 6 feet away from other people to protect against the spread of Coronavirus Disease 2019 (COVID-19). ';
+            if (width < 6) {
+                description += 'Social distancing can not be maintained';
+            }
+            else if (width < 9) {
+                description += 'It would be very difficult to maintain social distancing';
+            }
+            else {
+                description += 'It may be possible to maintain social distancing';
+            }
+            description += ' when crossing someone on this sidewalk or walking alongside someone on this sidewalk.</p>';
+
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup
+                .setLngLat(e.lngLat)
+                .setHTML(description)
+                .addTo(map);
+        };
+        map.on('mouseenter', 'sidewalk-widths', enter);
+        map.on('mouseenter', 'sidewalk-widths-bg3l5z', enter);
+
+        function leave() {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        }
+        map.on('mouseleave', 'sidewalk-widths', leave);
+        map.on('mouseleave', 'sidewalk-widths-bg3l5z', leave);
+    });
+</script>
+</body>
+</html>
+
